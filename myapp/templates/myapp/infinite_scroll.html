@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无限滚动示例 - 单页应用</title>
+    {% load static %}
+    <script src="{% static 'myapp/infinite_scroll.js' %}"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --background-color: #f9f9f9;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --light-text: #666666;
+            --border-radius: 12px;
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #9b59b6);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .content-item {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .content-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        .content-id {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        .content-timestamp {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+        
+        .content-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--light-text);
+            font-size: 1.1rem;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .end-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--light-text);
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .back-link:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>无限滚动示例</h1>
+            <p class="subtitle">向下滚动页面以加载更多内容...</p>
+        </header>
+        
+        <div id="content-container" class="content-container">
+            <!-- 内容将通过JavaScript动态加载 -->
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>正在加载更多内容...</p>
+        </div>
+        
+        <div id="end-message" class="end-message" style="display: none;">
+            <p>已加载全部内容</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{% url 'index' %}" class="back-link">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

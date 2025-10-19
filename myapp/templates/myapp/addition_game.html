@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加法游戏 - 梁海霞</title>
+    <!-- 加载React和ReactDOM -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* 游戏样式 */
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+        
+        /* 背景颜色变化，根据分数变化 */
+        body.score-5 {
+            background-color: #e8f4f8;
+        }
+        
+        body.score-8 {
+            background-color: #d0f0c0;
+        }
+        
+        body.winner {
+            background-color: #ffd700;
+            animation: winner-bg 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes winner-bg {
+            from { background-color: #ffd700; }
+            to { background-color: #ffb6c1; }
+        }
+        
+        #app {
+            text-align: center;
+            font-family: sans-serif;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        #app:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+        
+        #problem {
+            font-size: 72px;
+            margin: 20px 0;
+            color: #3498db;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        #problem.correct {
+            animation: correct-animation 0.5s ease;
+        }
+        
+        #problem.incorrect {
+            animation: incorrect-animation 0.5s ease;
+        }
+        
+        @keyframes correct-animation {
+            0% { transform: scale(1); color: #3498db; }
+            50% { transform: scale(1.2); color: #27ae60; }
+            100% { transform: scale(1); color: #3498db; }
+        }
+        
+        @keyframes incorrect-animation {
+            0%, 100% { transform: translateX(0); color: #3498db; }
+            25% { transform: translateX(-10px); color: #e74c3c; }
+            75% { transform: translateX(10px); color: #e74c3c; }
+        }
+        
+        input {
+            font-size: 36px;
+            padding: 10px;
+            width: 200px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .score {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #27ae60;
+            transition: color 0.3s ease;
+        }
+        
+        .score.high {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .feedback {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .feedback.visible {
+            opacity: 1;
+        }
+        
+        .feedback.correct {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .feedback.incorrect {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .instructions {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            text-align: left;
+        }
+        
+        #winner {
+            font-size: 72px;
+            color: green;
+            animation: celebrate 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes celebrate {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        
+        .developer-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+        
+        .game-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .restart-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .restart-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .difficulty-btn {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .difficulty-btn:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+        }
+        
+        .difficulty-btn.active {
+            background-color: #34495e;
+        }
+        
+        .home-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .home-link:hover {
+            background-color: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            #app {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            #problem {
+                font-size: 48px;
+            }
+            
+            input {
+                font-size: 24px;
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // 加法游戏React组件
+        // 作者：梁海霞
+        // 日期：2025-10-19
+        
+        function AdditionGame() {
+            // 使用useState钩子管理游戏状态
+            const [state, setState] = React.useState({
+                num1: Math.ceil(Math.random() * 10), // 第一个随机数
+                num2: Math.ceil(Math.random() * 10), // 第二个随机数
+                response: "",                        // 用户输入
+                score: 0,                           // 当前分数
+                difficulty: 'easy',                  // 难度级别
+                feedback: null,                      // 反馈信息
+                feedbackType: null                   // 反馈类型 (correct/incorrect)
+            });
+            
+            // 生成随机数，根据难度级别调整范围
+            const generateRandomNumber = () => {
+                switch(state.difficulty) {
+                    case 'easy':
+                        return Math.ceil(Math.random() * 10);
+                    case 'medium':
+                        return Math.ceil(Math.random() * 50);
+                    case 'hard':
+                        return Math.ceil(Math.random() * 100);
+                    default:
+                        return Math.ceil(Math.random() * 10);
+                }
+            };
+            
+            // 更新用户输入的函数
+            const updateResponse = (event) => {
+                setState({
+                    ...state,
+                    response: event.target.value
+                });
+            };
+            
+            // 显示反馈信息
+            const showFeedback = (type, message) => {
+                setState({
+                    ...state,
+                    feedback: message,
+                    feedbackType: type
+                });
+                
+                // 3秒后隐藏反馈
+                setTimeout(() => {
+                    setState(prevState => ({
+                        ...prevState,
+                        feedback: null,
+                        feedbackType: null
+                    }));
+                }, 3000);
+            };
+            
+            // 处理用户按键事件
+            const inputKeyPress = (event) => {
+                if (event.key === "Enter") {
+                    const answer = parseInt(state.response);
+                    
+                    // 验证输入是否为数字
+                    if (isNaN(answer)) {
+                        alert("请输入有效的数字！");
+                        return;
+                    }
+                    
+                    if (answer === state.num1 + state.num2) {
+                        // 用户回答正确
+                        setState(prevState => ({
+                            ...prevState,
+                            score: prevState.score + 1,
+                            response: "",
+                            num1: generateRandomNumber(),
+                            num2: generateRandomNumber()
+                        }));
+                        
+                        // 显示正确反馈
+                        showFeedback('correct', '正确！加1分');
+                        
+                        // 更新背景颜色
+                        updateBackgroundColor(state.score + 1);
+                    } else {
+                        // 用户回答错误
+                        setState(prevState => ({
+                            ...prevState,
+                            score: Math.max(0, prevState.score - 1), // 确保分数不会低于0
+                            response: ""
+                        }));
+                        
+                        // 显示错误反馈
+                        showFeedback('incorrect', `错误！正确答案是 ${state.num1 + state.num2}`);
+                        
+                        // 更新背景颜色
+                        updateBackgroundColor(Math.max(0, state.score - 1));
+                    }
+                }
+            };
+            
+            // 更新背景颜色
+            const updateBackgroundColor = (score) => {
+                const body = document.body;
+                body.className = '';
+                
+                if (score >= 10) {
+                    body.classList.add('winner');
+                } else if (score >= 8) {
+                    body.classList.add('score-8');
+                } else if (score >= 5) {
+                    body.classList.add('score-5');
+                }
+            };
+            
+            // 更改难度级别
+            const changeDifficulty = (difficulty) => {
+                setState(prevState => ({
+                    ...prevState,
+                    difficulty: difficulty,
+                    num1: generateRandomNumber(),
+                    num2: generateRandomNumber(),
+                    score: 0
+                }));
+                
+                // 重置背景颜色
+                document.body.className = '';
+            };
+            
+            // 重新开始游戏
+            const restartGame = () => {
+                setState(prevState => ({
+                    ...prevState,
+                    num1: generateRandomNumber(),
+                    num2: generateRandomNumber(),
+                    response: "",
+                    score: 0,
+                    feedback: null,
+                    feedbackType: null
+                }));
+                
+                // 重置背景颜色
+                document.body.className = '';
+            };
+            
+            // 当用户获得10分时显示胜利界面
+            if (state.score === 10) {
+                return (
+                    <div id="app">
+                        <div id="winner">恭喜你赢了！</div>
+                        <div className="score high">最终分数: 10</div>
+                        <div className="game-controls">
+                            <button className="difficulty-btn" onClick={() => changeDifficulty('easy')}>简单模式</button>
+                            <button className="difficulty-btn" onClick={() => changeDifficulty('medium')}>中等模式</button>
+                            <button className="difficulty-btn" onClick={() => changeDifficulty('hard')}>困难模式</button>
+                        </div>
+                        <div className="game-controls">
+                            <button className="restart-btn" onClick={restartGame}>再玩一次</button>
+                        </div>
+                        <a href="/" className="home-link">返回首页</a>
+                        <div className="developer-info">
+                            <p>开发者：梁海霞</p>
+                            <p>基于CS50 Web编程课程的第6讲内容实现</p>
+                        </div>
+                    </div>
+                );
+            }
+            
+            // 渲染游戏界面
+            return (
+                <div id="app">
+                    <h1>加法游戏</h1>
+                    <div className="game-controls">
+                        <button 
+                            className={`difficulty-btn ${state.difficulty === 'easy' ? 'active' : ''}`}
+                            onClick={() => changeDifficulty('easy')}
+                        >
+                            简单模式
+                        </button>
+                        <button 
+                            className={`difficulty-btn ${state.difficulty === 'medium' ? 'active' : ''}`}
+                            onClick={() => changeDifficulty('medium')}
+                        >
+                            中等模式
+                        </button>
+                        <button 
+                            className={`difficulty-btn ${state.difficulty === 'hard' ? 'active' : ''}`}
+                            onClick={() => changeDifficulty('hard')}
+                        >
+                            困难模式
+                        </button>
+                    </div>
+                    <div 
+                        id="problem"
+                        className={state.feedbackType}
+                    >
+                        {state.num1} + {state.num2}
+                    </div>
+                    <input 
+                        type="number" 
+                        value={state.response} 
+                        onChange={updateResponse} 
+                        onKeyPress={inputKeyPress}
+                        placeholder="输入答案"
+                        autoFocus
+                    />
+                    <div className={`score ${state.score >= 8 ? 'high' : ''}`}>
+                        分数: {state.score}
+                    </div>
+                    {state.feedback && (
+                        <div className={`feedback ${state.feedbackType} visible`}>
+                            {state.feedback}
+                        </div>
+                    )}
+                    <div className="instructions">
+                        <p><strong>说明：</strong></p>
+                        <p>1. 计算上面两个数字的和</p>
+                        <p>2. 在输入框中输入答案，然后按Enter键</p>
+                        <p>3. 答对加1分，答错扣1分</p>
+                        <p>4. 获得10分即可获胜！</p>
+                        <p><strong>难度设置：</strong></p>
+                        <p>- 简单模式：1-10的数字</p>
+                        <p>- 中等模式：1-50的数字</p>
+                        <p>- 困难模式：1-100的数字</p>
+                    </div>
+                    <div className="game-controls">
+                        <button className="restart-btn" onClick={restartGame}>重新开始</button>
+                    </div>
+                    <a href="/" className="home-link">返回首页</a>
+                    <div className="developer-info">
+                        <p>开发者：梁海霞</p>
+                        <p>技术栈：React</p>
+                        <p>创建时间：2025-10-19</p>
+                    </div>
+                </div>
+            );
+        }
+        
+        // 渲染React组件到DOM
+        ReactDOM.render(
+            <AdditionGame />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>

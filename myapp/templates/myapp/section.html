@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>章节 {{ section_id }} - 单页应用示例</title>
+    {% load static %}
+    <script src="{% static 'myapp/singlepage.js' %}"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --background-color: #f9f9f9;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --light-text: #666666;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 20px 0;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--primary-color), #9b59b6);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: white;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .navigation h2 {
+            width: 100%;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            font-size: 1.4rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 62, 80, 0.3);
+        }
+        
+        .content-card {
+            background: var(--card-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin: 25px 0;
+            flex: 1;
+            transition: var(--transition);
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .content-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+        
+        .content-text p {
+            margin-bottom: 16px;
+        }
+        
+        .content-text strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .content-text em {
+            color: var(--light-text);
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .home-btn {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .home-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .game-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .game-btn:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .developer-info {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .developer-info p {
+            margin: 5px 0;
+            color: var(--light-text);
+            font-size: 0.95rem;
+        }
+        
+        .developer-info strong {
+            color: var(--primary-color);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: transparent;
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), #9b59b6);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+        
+        #scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+        }
+        
+        #scroll-to-top:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .section-subtitle {
+                font-size: 1rem;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                min-width: 100px;
+                font-size: 14px;
+            }
+            
+            .navigation {
+                justify-content: center;
+            }
+            
+            #scroll-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .content-text {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 滚动进度条 -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>章节 {{ section_id }}</h1>
+            <p class="section-subtitle">单页应用示例 - 基于CS50 Web编程课程</p>
+        </header>
+        
+        <div class="navigation">
+            <h2>选择其他章节：</h2>
+            <button data-section="1" class="btn btn-primary">部分 1</button>
+            <button data-section="2" class="btn btn-primary">部分 2</button>
+            <button data-section="3" class="btn btn-primary">部分 3</button>
+        </div>
+        
+        <div class="content-card">
+            <div class="content-text" id="content">
+                {{ content }}
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{% url 'index' %}" class="btn home-btn">返回首页</a>
+            <a href="/addition_game" class="btn game-btn">玩加法游戏</a>
+        </div>
+        
+        <div class="developer-info">
+            <p><strong>开发者：梁海霞</strong></p>
+            <p>基于CS50 Web编程课程的第6讲内容实现</p>
+            <p>技术栈：Django + JavaScript + AJAX + History API</p>
+            <p>创建时间：2025-10-19</p>
+        </div>
+        
+        <div class="footer">
+            <p>基于CS50 Web编程课程的第6讲内容实现</p>
+        </div>
+    </div>
+    
+    <!-- 回到顶部按钮 -->
+    <button id="scroll-to-top" title="回到顶部">↑</button>
+    
+    <script>
+        // 滚动进度条
+        window.onscroll = function() {
+            // 显示/隐藏回到顶部按钮
+            const scrollToTopBtn = document.getElementById("scroll-to-top");
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                scrollToTopBtn.style.display = "flex";
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+            
+            // 更新进度条
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+        
+        // 回到顶部功能
+        document.getElementById("scroll-to-top").addEventListener("click", function() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+        
+        // 章节导航 - 保留原来的data-section方式以兼容现有的JavaScript
+        document.querySelectorAll('.navigation button[data-section]').forEach(button => {
+            button.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                showSection(section);
+            });
+        });
+        
+        // 添加页面加载动画
+        document.addEventListener("DOMContentLoaded", function() {
+            document.body.classList.add("loaded");
+        });
+    </script>
+</body>
+</html>
